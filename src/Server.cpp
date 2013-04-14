@@ -20,7 +20,7 @@ Server::~Server() {
 // TODO Auto-generated destructor stub
 }
 
-void Server::handleGetNewConnectionID(boost::asio::placeholders::error& e ,tcp::socket *newSocket) {
+void Server::handleGetNewConnectionID(boost::system::error_code& e ,tcp::socket *newSocket) {
 	if(!e)
 	{
 	size_t *id = new size_t();
