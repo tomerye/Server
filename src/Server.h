@@ -23,8 +23,8 @@ private:
 	boost::asio::io_service& io_service_;
 	tcp::acceptor acceptor_;
 	std::map< int, ClientConnection*> connection_map_;
-	void addNewConnection(size_t *id,tcp::socket *newSocket);
-	void handleGetNewConnectionID(tcp::socket *newSocket);
+	void addNewConnection(boost::system::error_code& e,size_t *id,tcp::socket *newSocket);
+	void handleGetNewConnectionID(boost::system::error_code& e,tcp::socket *newSocket);
 };
 
 #endif /* SERVER_H_ */
