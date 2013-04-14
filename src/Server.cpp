@@ -12,7 +12,7 @@ Server::Server(int port, boost::asio::io_service io_service) :
 				io_service, endpoint_) {
 	tcp::socket *newSocket = new tcp::socket();
 	acceptor_.async_accept(*newSocket,
-			boost::bind(Server::handleGetNewConnectionID, this, newSocket));
+			boost::bind(&Server::handleGetNewConnectionID,this,boost::asio::placeholders::error,  newSocket));
 
 }
 
@@ -20,10 +20,15 @@ Server::~Server() {
 // TODO Auto-generated destructor stub
 }
 
-void Server::handleGetNewConnectionID(tcp::socket *newSocket) {
+void Server::handleGetNewConnectionID(boost::asio::placeholders::error& e ,tcp::socket *newSocket) {
+	if(!e)
+	{
 	size_t *id = new size_t();
 	boost::asio::async_read(*newSocket, boost::asio::buffer(id, sizeof(size_t)),
 			boost::bind(Server::addNewConnection(id,newSocket)));
+	}
+	else
+		std::cout << "error " << __LINE__ << __FILE__ << std::endl;
 }
 
 void Server::addNewConnection(size_t *id,tcp::socket *newSocket) {
