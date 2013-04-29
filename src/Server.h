@@ -16,15 +16,15 @@
 using boost::asio::ip::tcp;
 class Server {
 public:
-	Server(int port, boost::asio::io_service io_service);
+	Server(int port, boost::asio::io_service &io_service);
 	virtual ~Server();
 private:
 	tcp::endpoint endpoint_;
 	boost::asio::io_service& io_service_;
 	tcp::acceptor acceptor_;
 	std::map< int, ClientConnection*> connection_map_;
-	void addNewConnection(boost::system::error_code& e,size_t *id,tcp::socket *newSocket);
-	void handleGetNewConnectionID(boost::system::error_code& e,tcp::socket *newSocket);
+	void addNewConnection(const boost::system::error_code& e,size_t *id,tcp::socket *newSocket);
+	void handleGetNewConnectionID(const boost::system::error_code& e,tcp::socket *newSocket);
 };
 
 #endif /* SERVER_H_ */

@@ -8,6 +8,10 @@
 #ifndef CLIENTCONNECTION_H_
 #define CLIENTCONNECTION_H_
 
+
+#include <boost/asio.hpp>
+#include "AsyncSerializationConnection.h"
+
 using boost::asio::ip::tcp;
 
 class ClientConnection {

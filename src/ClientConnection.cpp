@@ -7,7 +7,7 @@
 
 #include "ClientConnection.h"
 
-ClientConnection::ClientConnection(tcp::socket *socket):connection_(*socket) {
+ClientConnection::ClientConnection(tcp::socket *socket):connection_(socket) {
 }
 
 ClientConnection::~ClientConnection() {
