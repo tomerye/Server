@@ -22,9 +22,13 @@ private:
 	tcp::endpoint endpoint_;
 	boost::asio::io_service& io_service_;
 	tcp::acceptor acceptor_;
-	std::map< int, ClientConnection*> connection_map_;
-	void addNewConnection(const boost::system::error_code& e,size_t *id,tcp::socket *newSocket);
-	void handleGetNewConnectionID(const boost::system::error_code& e,tcp::socket *newSocket);
+	std::map<int, ClientConnection*> connection_map_;
+	void startAccept();
+	void addNewConnection(const boost::system::error_code& e, size_t *id,
+			tcp::socket *newSocket);
+	void handleGetNewConnectionID(const boost::system::error_code& e,
+			tcp::socket *newSocket);
+	 void send(const size_t id , const Packet packet);
 };
 
 #endif /* SERVER_H_ */

@@ -28,6 +28,8 @@ public:
 	}
 
 	~AsyncSerializationConnection() {
+
+
 		delete socket_;
 	}
 
