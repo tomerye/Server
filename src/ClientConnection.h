@@ -9,26 +9,27 @@
 #define CLIENTCONNECTION_H_
 
 #include <boost/asio.hpp>
-#include "AsyncSerializationConnection.h"
+#include "AsyncSerializationConnection.cpp"
 #include "Packet.h"
 #include <boost/system/error_code.hpp>
 #include <boost/bind.hpp>
+#include "Server.h"
 
 
 
 
-
-
+class Server;
 using boost::asio::ip::tcp;
 
 class ClientConnection {
 public:
-	ClientConnection(tcp::socket *socket);
+	ClientConnection(tcp::socket *socket , Server *server ,char id);
 	virtual ~ClientConnection();
 	tcp::socket& getSocket() const;
 	void send(Packet Packet);
 private:
-
+	Server *pServer_;
+	char id_;
 	void waitForPacket();
 	void handleReceivePacket(const boost::system::error_code& e,
 			Packet *packet);

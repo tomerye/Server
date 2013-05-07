@@ -7,8 +7,9 @@
 
 #include "ClientConnection.h"
 
-ClientConnection::ClientConnection(tcp::socket *socket) :
-		connection_(socket) {
+ClientConnection::ClientConnection(tcp::socket *socket , Server *server,char id) :
+		id_(id),connection_(socket) {
+	this->pServer_=server;
 }
 
 ClientConnection::~ClientConnection() {
@@ -31,9 +32,10 @@ void ClientConnection::waitForPacket() {
 void ClientConnection::handleReceivePacket(const boost::system::error_code& e,
 		Packet *packet) {
 	if (!e) {
-
+			std::cout << "Recived id:" << packet->id_ << std::endl;
 	} else {
-		std::cout << "error waitForPacket/n";
+
+		pServer_->deleteConnection(id_);
 	}
 	delete packet;
 }
@@ -43,6 +45,7 @@ void ClientConnection::sendResult(const boost::system::error_code& e){
 
 	}
 	else{
+		pServer_->deleteConnection(id_);
 		std::cout << "error send to client/n";
 	}
 }
