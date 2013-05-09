@@ -19,7 +19,9 @@ ClientConnection::~ClientConnection() {
 }
 
 void ClientConnection::send(Packet packet) {
-	connection_.async_write(packet,
+	std::vector<Packet> *packetsVec = new std::vector<Packet>();
+	packetsVec->push_back(packet);
+	connection_.async_write(*packetsVec,
 			boost::bind(&ClientConnection::sendResult, this,
 					boost::asio::placeholders::error));
 }
