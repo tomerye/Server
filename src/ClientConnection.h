@@ -23,13 +23,13 @@ using boost::asio::ip::tcp;
 
 class ClientConnection {
 public:
-	ClientConnection(tcp::socket *socket , Server *server ,char id);
+	ClientConnection(tcp::socket *socket , Server *server ,size_t id);
 	virtual ~ClientConnection();
 	tcp::socket& getSocket() const;
 	void send(Packet Packet);
 private:
 	Server *pServer_;
-	char id_;
+	size_t id_;
 	void waitForPacket();
 	void handleReceivePacket(const boost::system::error_code& e,
 			Packet *packet);

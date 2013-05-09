@@ -7,9 +7,11 @@
 
 #include "ClientConnection.h"
 
-ClientConnection::ClientConnection(tcp::socket *socket , Server *server,char id) :
-		id_(id),connection_(socket) {
-	this->pServer_=server;
+ClientConnection::ClientConnection(tcp::socket *socket, Server *server,
+		size_t id) :
+		id_(id), connection_(socket) {
+	this->pServer_ = server;
+	waitForPacket();
 }
 
 ClientConnection::~ClientConnection() {
@@ -23,6 +25,8 @@ void ClientConnection::send(Packet packet) {
 }
 
 void ClientConnection::waitForPacket() {
+	std::cout << "waiting for packets from client\n";
+	std::cout.flush();
 	Packet *newPacket = new Packet();
 	connection_.async_read(newPacket,
 			boost::bind(&ClientConnection::handleReceivePacket, this,
@@ -31,8 +35,13 @@ void ClientConnection::waitForPacket() {
 
 void ClientConnection::handleReceivePacket(const boost::system::error_code& e,
 		Packet *packet) {
+	waitForPacket();
 	if (!e) {
-			std::cout << "Recived id:" << packet->id_ << std::endl;
+		std::cout << sizeof(*packet) << std::endl;
+		std::cout << "Recived id:" << packet->id_ << std::endl;
+		std::cout << "Recived file path:" << packet->file_path_ << std::endl;
+		std::cout << "Recived opcode:" << packet->opcode_ << std::endl;
+
 	} else {
 
 		pServer_->deleteConnection(id_);
@@ -40,12 +49,11 @@ void ClientConnection::handleReceivePacket(const boost::system::error_code& e,
 	delete packet;
 }
 
-void ClientConnection::sendResult(const boost::system::error_code& e){
-	if(!e){
+void ClientConnection::sendResult(const boost::system::error_code& e) {
+	if (!e) {
 
-	}
-	else{
+	} else {
 		pServer_->deleteConnection(id_);
-		std::cout << "error send to client/n";
+		std::cout << "error send to client\n";
 	}
 }

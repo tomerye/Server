@@ -19,6 +19,7 @@ Server::Server(int port, boost::asio::io_service &io_service) :
 void Server::startAccept() {
 	cout << "Start accept!\n";
 	tcp::socket *newSocket = new tcp::socket(io_service_);
+//	*newSocket->
 	acceptor_.async_accept(*newSocket,
 			boost::bind(&Server::handleGetNewConnectionID, this,
 					boost::asio::placeholders::error, newSocket));
@@ -33,11 +34,11 @@ void Server::handleGetNewConnectionID(const boost::system::error_code& e,
 
 	if (!e) {
 		cout << "handleGetNewConnectionID\n";
-		char *clientId = new char();
+		size_t *clientId = new size_t();
 		boost::asio::async_read(*newSocket,
-				boost::asio::buffer(clientId, sizeof(char)),
+				boost::asio::buffer(clientId, sizeof(size_t)),
 				boost::bind(&Server::addNewConnection, this,
-						boost::asio::placeholders::error, clientId, newSocket));
+						 clientId, newSocket,boost::asio::placeholders::error));
 	} else {
 
 		std::cout << "error " << __FILE__ << __LINE__ << std::endl;
@@ -47,9 +48,10 @@ void Server::handleGetNewConnectionID(const boost::system::error_code& e,
 	startAccept();
 }
 
-void Server::addNewConnection(const boost::system::error_code& e, char *id,
-		tcp::socket *newSocket) {
-	std::cout << "received new ID:" << *id;
+void Server::addNewConnection(size_t *id, tcp::socket *newSocket,
+		const boost::system::error_code& e) {
+	std::cout << "received new ID:" << (size_t)*id << std::endl;
+	std::cout.flush();
 	if (!e) {
 		if (connection_map_.find(*id) == connection_map_.end()) {
 			connection_map_[*id] = new ClientConnection(newSocket, this, *id);
@@ -64,7 +66,7 @@ void Server::addNewConnection(const boost::system::error_code& e, char *id,
 	}
 }
 
-void Server::deleteConnection(const char id) {
+void Server::deleteConnection(const size_t id) {
 	std::map<int, ClientConnection*>::iterator it = connection_map_.find(id);
 	cout << "Delete connection with ID:" << id <<endl;
 	if (it != connection_map_.end()) {
@@ -75,7 +77,7 @@ void Server::deleteConnection(const char id) {
 	}
 }
 
-void Server::send(const char id, const Packet packet) {
+void Server::send(const size_t id, const Packet packet) {
 	std::map<int, ClientConnection*>::iterator it = connection_map_.find(id);
 	cout << "trying to send packet to ID:" << id << endl;
 	if (it != connection_map_.end()) {
