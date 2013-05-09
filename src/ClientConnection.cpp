@@ -27,26 +27,29 @@ void ClientConnection::send(Packet packet) {
 void ClientConnection::waitForPacket() {
 	std::cout << "waiting for packets from client\n";
 	std::cout.flush();
-	Packet *newPacket = new Packet();
-	connection_.async_read(newPacket,
+	std::vector<Packet> *packetsVec = new std::vector<Packet>();
+	connection_.async_read(*packetsVec,
 			boost::bind(&ClientConnection::handleReceivePacket, this,
-					boost::asio::placeholders::error, newPacket));
+					boost::asio::placeholders::error, packetsVec));
 }
 
 void ClientConnection::handleReceivePacket(const boost::system::error_code& e,
-		Packet *packet) {
+		std::vector<Packet> *packetsVec) {
 	waitForPacket();
 	if (!e) {
-		std::cout << sizeof(*packet) << std::endl;
-		std::cout << "Recived id:" << packet->id_ << std::endl;
-		std::cout << "Recived file path:" << packet->file_path_ << std::endl;
-		std::cout << "Recived opcode:" << packet->opcode_ << std::endl;
-
+		std::cout << "parsing the packet\n";
+		for (std::size_t i = 0; i < packetsVec->size(); ++i) {
+			std::cout << "Recived id:" << ((*packetsVec)[i]).id_ << std::endl;
+			std::cout << "Recived file path:" << ((*packetsVec)[i]).file_path_
+					<< std::endl;
+			std::cout << "Recived opcode:" << ((*packetsVec)[i]).opcode_<< std::endl;
+			std::cout.flush();
+		}
 	} else {
-
+		std::cout << "error while parsing the packet\n";
 		pServer_->deleteConnection(id_);
 	}
-	delete packet;
+	delete packetsVec;
 }
 
 void ClientConnection::sendResult(const boost::system::error_code& e) {

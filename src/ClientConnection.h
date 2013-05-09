@@ -28,11 +28,12 @@ public:
 	tcp::socket& getSocket() const;
 	void send(Packet Packet);
 private:
+//	std::vector<Packet> packetsVec;
 	Server *pServer_;
 	size_t id_;
 	void waitForPacket();
 	void handleReceivePacket(const boost::system::error_code& e,
-			Packet *packet);
+			std::vector<Packet> *packetsVec);
 	void sendResult(const boost::system::error_code& e);
 	AsyncSerializationConnection connection_;
 };
