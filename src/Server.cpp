@@ -19,7 +19,6 @@ Server::Server(int port, boost::asio::io_service &io_service) :
 void Server::startAccept() {
 	cout << "Start accept!\n";
 	tcp::socket *newSocket = new tcp::socket(io_service_);
-//	*newSocket->
 	acceptor_.async_accept(*newSocket,
 			boost::bind(&Server::handleGetNewConnectionID, this,
 					boost::asio::placeholders::error, newSocket));
@@ -33,24 +32,24 @@ void Server::handleGetNewConnectionID(const boost::system::error_code& e,
 		tcp::socket *newSocket) {
 
 	if (!e) {
-		cout << "handleGetNewConnectionID\n";
 		size_t *clientId = new size_t();
 		boost::asio::async_read(*newSocket,
 				boost::asio::buffer(clientId, sizeof(size_t)),
-				boost::bind(&Server::addNewConnection, this,
-						 clientId, newSocket,boost::asio::placeholders::error));
+				boost::bind(&Server::addNewConnection, this, clientId,
+						newSocket, boost::asio::placeholders::error));
+		startAccept();
 	} else {
 
 		std::cout << "error " << __FILE__ << __LINE__ << std::endl;
 		delete newSocket;
 
 	}
-	startAccept();
+
 }
 
 void Server::addNewConnection(size_t *id, tcp::socket *newSocket,
 		const boost::system::error_code& e) {
-	std::cout << "received new ID:" << (size_t)*id << std::endl;
+	std::cout << "received new ID:" << (size_t) *id << std::endl;
 	std::cout.flush();
 	if (!e) {
 		if (connection_map_.find(*id) == connection_map_.end()) {
@@ -63,12 +62,14 @@ void Server::addNewConnection(size_t *id, tcp::socket *newSocket,
 		}
 	} else {
 		std::cout << "error addNewConnection/n";
+		delete newSocket;
+		delete id;
 	}
 }
 
 void Server::deleteConnection(const size_t id) {
 	std::map<int, ClientConnection*>::iterator it = connection_map_.find(id);
-	cout << "Delete connection with ID:" << id <<endl;
+	cout << "Delete connection with ID:" << id << endl;
 	if (it != connection_map_.end()) {
 		connection_map_.erase(it);
 		std::cout << "id" << id << "deleted!/n";

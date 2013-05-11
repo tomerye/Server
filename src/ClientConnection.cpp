@@ -23,7 +23,7 @@ void ClientConnection::send(Packet packet) {
 	packetsVec->push_back(packet);
 	connection_.async_write(*packetsVec,
 			boost::bind(&ClientConnection::sendResult, this,
-					boost::asio::placeholders::error));
+					boost::asio::placeholders::error, packetsVec));
 }
 
 void ClientConnection::waitForPacket() {
@@ -37,14 +37,16 @@ void ClientConnection::waitForPacket() {
 
 void ClientConnection::handleReceivePacket(const boost::system::error_code& e,
 		std::vector<Packet> *packetsVec) {
-	waitForPacket();
+
 	if (!e) {
+		waitForPacket();
 		std::cout << "parsing the packet\n";
 		for (std::size_t i = 0; i < packetsVec->size(); ++i) {
 			std::cout << "Recived id:" << ((*packetsVec)[i]).id_ << std::endl;
 			std::cout << "Recived file path:" << ((*packetsVec)[i]).file_path_
 					<< std::endl;
-			std::cout << "Recived opcode:" << ((*packetsVec)[i]).opcode_<< std::endl;
+			std::cout << "Recived opcode:" << ((*packetsVec)[i]).opcode_
+					<< std::endl;
 			std::cout.flush();
 		}
 	} else {
@@ -54,11 +56,14 @@ void ClientConnection::handleReceivePacket(const boost::system::error_code& e,
 	delete packetsVec;
 }
 
-void ClientConnection::sendResult(const boost::system::error_code& e) {
+void ClientConnection::sendResult(const boost::system::error_code& e,
+		std::vector<Packet> *packetsVec) {
+	delete packetsVec;
 	if (!e) {
+		std::cout << "packet sent to client!\n";
 
 	} else {
-		pServer_->deleteConnection(id_);
 		std::cout << "error send to client\n";
+		pServer_->deleteConnection(id_);
 	}
 }

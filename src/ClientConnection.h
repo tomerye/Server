@@ -15,15 +15,12 @@
 #include <boost/bind.hpp>
 #include "Server.h"
 
-
-
-
 class Server;
 using boost::asio::ip::tcp;
 
 class ClientConnection {
 public:
-	ClientConnection(tcp::socket *socket , Server *server ,size_t id);
+	ClientConnection(tcp::socket *socket, Server *server, size_t id);
 	virtual ~ClientConnection();
 	tcp::socket& getSocket() const;
 	void send(Packet Packet);
@@ -34,7 +31,8 @@ private:
 	void waitForPacket();
 	void handleReceivePacket(const boost::system::error_code& e,
 			std::vector<Packet> *packetsVec);
-	void sendResult(const boost::system::error_code& e);
+	void sendResult(const boost::system::error_code& e,
+			std::vector<Packet> *packetsVec);
 	AsyncSerializationConnection connection_;
 };
 
