@@ -10,7 +10,8 @@
 
 #include <boost/asio.hpp>
 #include "AsyncSerializationConnection.cpp"
-#include "Packet.h"
+#include "PacketForClient.h"
+#include "PacketForServer.h"
 #include <boost/system/error_code.hpp>
 #include <boost/bind.hpp>
 #include "Server.h"
@@ -23,16 +24,16 @@ public:
 	ClientConnection(tcp::socket *socket, Server *server, size_t id);
 	virtual ~ClientConnection();
 	tcp::socket& getSocket() const;
-	void send(Packet Packet);
+	void send(PacketForClient Packet);
 private:
 //	std::vector<Packet> packetsVec;
 	Server *pServer_;
 	size_t id_;
 	void waitForPacket();
 	void handleReceivePacket(const boost::system::error_code& e,
-			std::vector<Packet> *packetsVec);
+			std::vector<PacketForServer> *packetsVec);
 	void sendResult(const boost::system::error_code& e,
-			std::vector<Packet> *packetsVec);
+			std::vector<PacketForClient> *packetsVec);
 	AsyncSerializationConnection connection_;
 };
 

@@ -18,8 +18,8 @@ ClientConnection::~ClientConnection() {
 	// TODO Auto-generated destructor stub
 }
 
-void ClientConnection::send(Packet packet) {
-	std::vector<Packet> *packetsVec = new std::vector<Packet>();
+void ClientConnection::send(PacketForClient packet) {
+	std::vector<PacketForClient> *packetsVec = new std::vector<PacketForClient>();
 	packetsVec->push_back(packet);
 	connection_.async_write(*packetsVec,
 			boost::bind(&ClientConnection::sendResult, this,
@@ -29,14 +29,14 @@ void ClientConnection::send(Packet packet) {
 void ClientConnection::waitForPacket() {
 	std::cout << "waiting for packets from client\n";
 	std::cout.flush();
-	std::vector<Packet> *packetsVec = new std::vector<Packet>();
+	std::vector<PacketForServer> *packetsVec = new std::vector<PacketForServer>();
 	connection_.async_read(*packetsVec,
 			boost::bind(&ClientConnection::handleReceivePacket, this,
 					boost::asio::placeholders::error, packetsVec));
 }
 
 void ClientConnection::handleReceivePacket(const boost::system::error_code& e,
-		std::vector<Packet> *packetsVec) {
+		std::vector<PacketForServer> *packetsVec) {
 
 	if (!e) {
 		waitForPacket();
@@ -57,7 +57,7 @@ void ClientConnection::handleReceivePacket(const boost::system::error_code& e,
 }
 
 void ClientConnection::sendResult(const boost::system::error_code& e,
-		std::vector<Packet> *packetsVec) {
+		std::vector<PacketForClient> *packetsVec) {
 	delete packetsVec;
 	if (!e) {
 		std::cout << "packet sent to client!\n";
