@@ -78,7 +78,7 @@ void Server::deleteConnection(const size_t id) {
 	}
 }
 
-void Server::send(const size_t id, const PacketForClient packet) {
+void Server::send(const size_t id, PacketForClient *packet) {
 	std::map<int, ClientConnection*>::iterator it = connection_map_.find(id);
 	cout << "trying to send packet to ID:" << id << endl;
 	if (it != connection_map_.end()) {

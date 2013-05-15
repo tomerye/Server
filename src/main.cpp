@@ -22,13 +22,16 @@ int main(int argc, char *argv[]) {
 	boost::asio::io_service io_service;
 	Server server(55555, io_service);
 	boost::thread t(boost::bind(&boost::asio::io_service::run, &io_service));
-	PacketForClient p;
-	p.id_ = 333;
-	p.file_path_ = "sfdsf";
-	p.opcode_ = 1;
+
 	char line[10];
 	while (std::cin.getline(line, 10))
+	{
+		PacketForClient *p = new PacketForClient();
+		p->id_ = 333;
+		p->file_path_ = "sfdsf";
+		p->opcode_ = 1;
 		server.send(123,p);
+	}
 //	io_service.run();
 	t.join();
 	return 0;

@@ -24,16 +24,16 @@ public:
 	ClientConnection(tcp::socket *socket, Server *server, size_t id);
 	virtual ~ClientConnection();
 	tcp::socket& getSocket() const;
-	void send(PacketForClient Packet);
+	void send(PacketForClient *packet);
 private:
 //	std::vector<Packet> packetsVec;
 	Server *pServer_;
 	size_t id_;
 	void waitForPacket();
 	void handleReceivePacket(const boost::system::error_code& e,
-			std::vector<PacketForServer> *packetsVec);
+			PacketForServer *newPacket);
 	void sendResult(const boost::system::error_code& e,
-			std::vector<PacketForClient> *packetsVec);
+			PacketForClient *packet);
 	AsyncSerializationConnection connection_;
 };
 

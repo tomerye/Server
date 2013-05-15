@@ -23,7 +23,7 @@ public:
 	Server(int port, boost::asio::io_service &io_service);
 	virtual ~Server();
 	void deleteConnection(const size_t id);
-	void send(const size_t id , const PacketForClient packet);
+	void send(const size_t id, PacketForClient *packet);
     void newEventPrv(int clientid ,PacketForServer event);
     void getFile(int clientid, std::string srcPath, std::string dstPath);
 

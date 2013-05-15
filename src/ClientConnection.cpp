@@ -18,47 +18,43 @@ ClientConnection::~ClientConnection() {
 	// TODO Auto-generated destructor stub
 }
 
-void ClientConnection::send(PacketForClient packet) {
-	std::vector<PacketForClient> *packetsVec = new std::vector<PacketForClient>();
-	packetsVec->push_back(packet);
-	connection_.async_write(*packetsVec,
+void ClientConnection::send(PacketForClient *packet) {
+	connection_.async_write(*packet,
 			boost::bind(&ClientConnection::sendResult, this,
-					boost::asio::placeholders::error, packetsVec));
+					boost::asio::placeholders::error, packet));
 }
 
 void ClientConnection::waitForPacket() {
 	std::cout << "waiting for packets from client\n";
 	std::cout.flush();
-	std::vector<PacketForServer> *packetsVec = new std::vector<PacketForServer>();
-	connection_.async_read(*packetsVec,
+	PacketForServer *newPacket = new PacketForServer();
+	connection_.async_read(*newPacket,
 			boost::bind(&ClientConnection::handleReceivePacket, this,
-					boost::asio::placeholders::error, packetsVec));
+					boost::asio::placeholders::error, newPacket));
 }
 
 void ClientConnection::handleReceivePacket(const boost::system::error_code& e,
-		std::vector<PacketForServer> *packetsVec) {
+		PacketForServer *newPacket) {
 
 	if (!e) {
 		waitForPacket();
 		std::cout << "parsing the packet\n";
-		for (std::size_t i = 0; i < packetsVec->size(); ++i) {
-			std::cout << "Recived id:" << ((*packetsVec)[i]).id_ << std::endl;
-			std::cout << "Recived file path:" << ((*packetsVec)[i]).file_path_
+			std::cout << "Recived id:" << newPacket->id_ << std::endl;
+			std::cout << "Recived file path:" << newPacket->file_path_
 					<< std::endl;
-			std::cout << "Recived opcode:" << ((*packetsVec)[i]).opcode_
+			std::cout << "Recived opcode:" << newPacket->opcode_
 					<< std::endl;
 			std::cout.flush();
-		}
 	} else {
 		std::cout << "error while parsing the packet\n";
 		pServer_->deleteConnection(id_);
 	}
-	delete packetsVec;
+	delete newPacket;
 }
 
 void ClientConnection::sendResult(const boost::system::error_code& e,
-		std::vector<PacketForClient> *packetsVec) {
-	delete packetsVec;
+		PacketForClient *packet) {
+
 	if (!e) {
 		std::cout << "packet sent to client!\n";
 
@@ -66,4 +62,5 @@ void ClientConnection::sendResult(const boost::system::error_code& e,
 		std::cout << "error send to client\n";
 		pServer_->deleteConnection(id_);
 	}
+	delete packet;
 }
