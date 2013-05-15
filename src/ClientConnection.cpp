@@ -19,9 +19,13 @@ ClientConnection::~ClientConnection() {
 }
 
 void ClientConnection::send(PacketForClient *packet) {
-	connection_.async_write(*packet,
-			boost::bind(&ClientConnection::sendResult, this,
-					boost::asio::placeholders::error, packet));
+	bool isEmpty = this->outPacketsBuffer_.empty();
+	this->outPacketsBuffer_.push_back(packet);
+	if (isEmpty) {
+		connection_.async_write(*(this->outPacketsBuffer_.front()),
+				boost::bind(&ClientConnection::handleSendPacket, this,
+						boost::asio::placeholders::error));
+	}
 }
 
 void ClientConnection::waitForPacket() {
@@ -52,15 +56,20 @@ void ClientConnection::handleReceivePacket(const boost::system::error_code& e,
 	delete newPacket;
 }
 
-void ClientConnection::sendResult(const boost::system::error_code& e,
-		PacketForClient *packet) {
+void ClientConnection::handleSendPacket(const boost::system::error_code& e) {
 
 	if (!e) {
 		std::cout << "packet sent to client!\n";
-
+		PacketForClient *tmp = this->outPacketsBuffer_.front();
+		this->outPacketsBuffer_.pop_front();
+		delete tmp;
+		if(!(this->outPacketsBuffer_.empty())){
+					connection_.async_write(*(this->outPacketsBuffer_.front()),
+									boost::bind(&ClientConnection::handleSendPacket, this,
+											boost::asio::placeholders::error));
+		}
 	} else {
 		std::cout << "error send to client\n";
 		pServer_->deleteConnection(id_);
 	}
-	delete packet;
 }

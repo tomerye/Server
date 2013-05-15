@@ -14,6 +14,7 @@
 #include "PacketForServer.h"
 #include <boost/system/error_code.hpp>
 #include <boost/bind.hpp>
+#include <deque>
 #include "Server.h"
 
 class Server;
@@ -26,14 +27,13 @@ public:
 	tcp::socket& getSocket() const;
 	void send(PacketForClient *packet);
 private:
-//	std::vector<Packet> packetsVec;
+	std::deque<PacketForClient*> outPacketsBuffer_;
 	Server *pServer_;
 	size_t id_;
 	void waitForPacket();
 	void handleReceivePacket(const boost::system::error_code& e,
 			PacketForServer *newPacket);
-	void sendResult(const boost::system::error_code& e,
-			PacketForClient *packet);
+	void handleSendPacket(const boost::system::error_code& e);
 	AsyncSerializationConnection connection_;
 };
 
