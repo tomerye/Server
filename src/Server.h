@@ -22,19 +22,19 @@ class Server{
 public:
 	Server(int port, boost::asio::io_service &io_service);
 	virtual ~Server();
-	void deleteConnection(const size_t id);
-	void send(const size_t id, PacketForClient *packet);
-    void newEventPrv(int clientid ,PacketForServer event);
-    void getFile(int clientid, std::string srcPath, std::string dstPath);
+	void deleteConnection(const u_int32_t id);
+	void send(const u_int32_t id, PacketForClient *packet);
+    void newEventPrv(u_int32_t clientid ,PacketForServer event);
+    void getFile(u_int32_t clientid, std::string srcPath, std::string dstPath);
 
 private:
 	tcp::endpoint endpoint_;
 	boost::asio::io_service& io_service_;
 	tcp::acceptor acceptor_;
-	std::map<int, ClientConnection*> connection_map_;
+	std::map<u_int32_t, ClientConnection*> connection_map_;
 
 	void startAccept();
-	void addNewConnection(size_t *id, tcp::socket *newSocket,
+	void addNewConnection(u_int32_t *id, tcp::socket *newSocket,
 			const boost::system::error_code& e);
 	void handleGetNewConnectionID(const boost::system::error_code& e,
 			tcp::socket *newSocket);

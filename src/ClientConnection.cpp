@@ -8,7 +8,7 @@
 #include "ClientConnection.h"
 
 ClientConnection::ClientConnection(tcp::socket *socket, Server *server,
-		size_t id) :
+		u_int32_t id) :
 		id_(id), connection_(socket) {
 	this->pServer_ = server;
 	waitForPacket();
@@ -43,12 +43,10 @@ void ClientConnection::handleReceivePacket(const boost::system::error_code& e,
 	if (!e) {
 		waitForPacket();
 		std::cout << "parsing the packet\n";
-			std::cout << "Recived id:" << newPacket->id_ << std::endl;
-			std::cout << "Recived file path:" << newPacket->file_path_
-					<< std::endl;
-			std::cout << "Recived opcode:" << newPacket->opcode_
-					<< std::endl;
-			std::cout.flush();
+		std::cout << "Recived id:" << newPacket->id_ << std::endl;
+		std::cout << "Recived file path:" << newPacket->file_path_ << std::endl;
+		std::cout << "Recived opcode:" << newPacket->opcode_ << std::endl;
+		std::cout.flush();
 	} else {
 		std::cout << "error while parsing the packet\n";
 		pServer_->deleteConnection(id_);
@@ -63,10 +61,10 @@ void ClientConnection::handleSendPacket(const boost::system::error_code& e) {
 		PacketForClient *tmp = this->outPacketsBuffer_.front();
 		this->outPacketsBuffer_.pop_front();
 		delete tmp;
-		if(!(this->outPacketsBuffer_.empty())){
-					connection_.async_write(*(this->outPacketsBuffer_.front()),
-									boost::bind(&ClientConnection::handleSendPacket, this,
-											boost::asio::placeholders::error));
+		if (!(this->outPacketsBuffer_.empty())) {
+			connection_.async_write(*(this->outPacketsBuffer_.front()),
+					boost::bind(&ClientConnection::handleSendPacket, this,
+							boost::asio::placeholders::error));
 		}
 	} else {
 		std::cout << "error send to client\n";

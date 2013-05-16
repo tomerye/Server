@@ -22,14 +22,14 @@ using boost::asio::ip::tcp;
 
 class ClientConnection {
 public:
-	ClientConnection(tcp::socket *socket, Server *server, size_t id);
+	ClientConnection(tcp::socket *socket, Server *server, u_int32_t id);
 	virtual ~ClientConnection();
 	tcp::socket& getSocket() const;
 	void send(PacketForClient *packet);
 private:
 	std::deque<PacketForClient*> outPacketsBuffer_;
 	Server *pServer_;
-	size_t id_;
+	u_int32_t id_;
 	void waitForPacket();
 	void handleReceivePacket(const boost::system::error_code& e,
 			PacketForServer *newPacket);

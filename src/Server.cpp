@@ -32,9 +32,9 @@ void Server::handleGetNewConnectionID(const boost::system::error_code& e,
 		tcp::socket *newSocket) {
 
 	if (!e) {
-		size_t *clientId = new size_t();
+		u_int32_t *clientId = new u_int32_t();
 		boost::asio::async_read(*newSocket,
-				boost::asio::buffer(clientId, sizeof(size_t)),
+				boost::asio::buffer(clientId, sizeof(u_int32_t)),
 				boost::bind(&Server::addNewConnection, this, clientId,
 						newSocket, boost::asio::placeholders::error));
 		startAccept();
@@ -47,9 +47,9 @@ void Server::handleGetNewConnectionID(const boost::system::error_code& e,
 
 }
 
-void Server::addNewConnection(size_t *id, tcp::socket *newSocket,
+void Server::addNewConnection(u_int32_t *id, tcp::socket *newSocket,
 		const boost::system::error_code& e) {
-	std::cout << "received new ID:" << (size_t) *id << std::endl;
+	std::cout << "received new ID:" << (u_int32_t) *id << std::endl;
 	std::cout.flush();
 	if (!e) {
 		if (connection_map_.find(*id) == connection_map_.end()) {
@@ -67,8 +67,9 @@ void Server::addNewConnection(size_t *id, tcp::socket *newSocket,
 	}
 }
 
-void Server::deleteConnection(const size_t id) {
-	std::map<int, ClientConnection*>::iterator it = connection_map_.find(id);
+void Server::deleteConnection(const u_int32_t id) {
+	std::map<u_int32_t, ClientConnection*>::iterator it = connection_map_.find(
+			id);
 	cout << "Delete connection with ID:" << id << endl;
 	if (it != connection_map_.end()) {
 		connection_map_.erase(it);
@@ -78,8 +79,9 @@ void Server::deleteConnection(const size_t id) {
 	}
 }
 
-void Server::send(const size_t id, PacketForClient *packet) {
-	std::map<int, ClientConnection*>::iterator it = connection_map_.find(id);
+void Server::send(const u_int32_t id, PacketForClient *packet) {
+	std::map<u_int32_t, ClientConnection*>::iterator it = connection_map_.find(
+			id);
 	cout << "trying to send packet to ID:" << id << endl;
 	if (it != connection_map_.end()) {
 		it->second->send(packet);
@@ -88,3 +90,31 @@ void Server::send(const size_t id, PacketForClient *packet) {
 	}
 
 }
+
+void Server::newEventPrv(u_int32_t clientid, PacketForServer packet) {
+//    std::map<int, ClientConnection*>::iterator it = connection_map_.find(clientid);
+//
+//    QVector<QString> eventVector;
+//    eventVector << QString::fromStdString(it->second->getSite()) << QString::fromStdString(packet.time_) << QString::fromStdString(it->second->getLocation()) << QString::number(packet.priority_);
+//    emit newEvent(eventVector);
+}
+
+void Server::getFile(u_int32_t clientid, string srcPath, string dstPath) {
+//    initFTP(clientid);
+//    this->pFtpClient_->DownloadFile(srcPath,dstPath);
+//    emit newPicture(dstPath);
+}
+
+//void Server::initFTP(int clientid){
+//    if(this->pFtpClient_==NULL){
+//        std::map<int, ClientConnection*>::iterator it = connection_map_.find(clientid);
+//        boost::asio::ip::tcp::endpoint remote_ep = (*(it->second->getSocket())).remote_endpoint();
+//        boost::asio::ip::address remote_ad = remote_ep.address();
+//        std::string clientIP = remote_ad.to_string();
+
+//        this->pLogoninfo_ = new nsFTP::CLogonInfo(clientIP,21,"anonymous","ddd");
+//        this->pFtpClient_ = new nsFTP::CFTPClient();
+//        this->pFtpClient_->Login(*(this->pLogoninfo_));
+
+//    }
+//}

@@ -27,10 +27,12 @@ public:
 		socket_ = socket;
 	}
 
+    boost::asio::ip::tcp::socket* getSocket(){
+        return this->socket_;
+    }
+
 	~AsyncSerializationConnection() {
-//
-//
-//		delete socket_;
+        delete socket_;
 	}
 
 	template<typename T, typename Handler>
